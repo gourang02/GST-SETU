@@ -528,13 +528,16 @@ export default function Invoices({ onNavigate, initialId }: Props) {
         <UploadInvoiceModal
           onClose={() => setShowUpload(false)}
           onUploaded={(newId, newInvoice) => {
+            // Add the new invoice to the list WITHOUT calling load()
+            // load() fetches from API/mock and would overwrite our new invoice
             if (newInvoice) {
               setInvoices(prev => [newInvoice, ...(Array.isArray(prev) ? prev : [])]);
             }
+            // Reset filter to 'all' so user can see the new invoice
+            setFilterStatus('all');
             if (newId) {
-              setSelectedId(newId);
+              setTimeout(() => setSelectedId(newId), 300);
             }
-            load();
           }}
         />
       )}
