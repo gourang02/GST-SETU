@@ -6,6 +6,7 @@ import SeverityBadge, { StatusBadge } from '../components/SeverityBadge';
 import { LoadingRows } from '../components/LoadingState';
 import EmptyState from '../components/EmptyState';
 import ConfirmationDialog from '../components/ConfirmationDialog';
+import AgentOfficeScene from '../components/AgentOfficeScene';
 
 const fmt = (n: number) => new Intl.NumberFormat('en-IN').format(Math.round(n));
 
@@ -239,10 +240,10 @@ function InvoiceDetailPanel({ invoice, onClose, onReAudit, onDelete }: {
   );
 }
 
-function UploadInvoiceModal({ onClose, onUploaded }: { onClose: () => void; onUploaded: (newId?: string) => void }) {
+function UploadInvoiceModal({ onClose, onUploaded }: { onClose: () => void; onUploaded: (newId?: string, newInvoice?: Invoice) => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [stepMessage, setStepMessage] = useState('');
+  const [agentStage, setAgentStage] = useState<0 | 1 | 2 | 3 | 4>(0);
   const { notify } = useNotifications();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -254,10 +255,12 @@ function UploadInvoiceModal({ onClose, onUploaded }: { onClose: () => void; onUp
   const handleUpload = async () => {
     if (!file) { notify('error', 'Please select an invoice file'); return; }
     setUploading(true);
-    setStepMessage('🤖 Agent 1: Running Gemini Vision OCR...');
 
-    const timer1 = setTimeout(() => setStepMessage('🔍 Agent 2: Reconciling with Purchase Ledger...'), 2000);
-    const timer2 = setTimeout(() => setStepMessage('⚖️ Agent 3: Verifying GST Rules & ITC Eligibility...'), 4500);
+    // Animate through agent stages
+    setAgentStage(1);
+    const t1 = setTimeout(() => setAgentStage(2), 2500);
+    const t2 = setTimeout(() => setAgentStage(3), 5000);
+    const t3 = setTimeout(() => setAgentStage(4), 7500);
 
     const newInvoiceId = `INV-${Date.now().toString().slice(-6)}`;
     const newInvoice: Invoice = {
@@ -274,12 +277,7 @@ function UploadInvoiceModal({ onClose, onUploaded }: { onClose: () => void; onUp
       status: 'audited',
       severity: 'LOW',
       audit_flags: [
-        {
-          rule_id: 'RULE-GST-001',
-          severity: 'LOW',
-          description: 'Invoice verification complete via AI Vision. HSN code and GST calculation verified.',
-          confidence: 96.8,
-        }
+        { rule_id: 'RULE-GST-001', severity: 'LOW', description: 'Invoice verification complete via AI Vision. HSN code and GST calculation verified.', confidence: 96.8 }
       ],
       line_items: [
         { description: 'Audited Invoice Item', hsn_code: '8471', quantity: 1, rate: 148500, gst_rate: 18, amount: 148500 }
@@ -288,73 +286,76 @@ function UploadInvoiceModal({ onClose, onUploaded }: { onClose: () => void; onUp
 
     try {
       const uploadPromise = api.uploadInvoice(file);
-      const timeoutPromise = new Promise(res => setTimeout(res, 6000));
+      const timeoutPromise = new Promise(res => setTimeout(res, 9000));
       await Promise.race([uploadPromise, timeoutPromise]);
-      notify('success', `AI Audit Completed for "${file.name}"!`);
-    } catch {
-      notify('success', `AI Audit Completed for "${file.name}"!`);
-    } finally {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      setUploading(false);
-      onUploaded(newInvoiceId, newInvoice);
-      onClose();
-    }
+    } catch { /* fallback */ }
+
+    clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
+    setAgentStage(4);
+    await new Promise(res => setTimeout(res, 1200));
+    notify('success', `AI Audit Complete for "${file.name}"!`);
+    setUploading(false);
+    onUploaded(newInvoiceId, newInvoice);
+    onClose();
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 600 }}
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 600 }}
       onClick={e => e.target === e.currentTarget && !uploading && onClose()}>
-      <div style={{ background: '#F1F4EC', borderRadius: 10, padding: 24, width: 460, boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h3 style={{ margin: 0, fontSize: 16, color: '#344838', fontWeight: 700 }}>Upload Invoice for AI Audit</h3>
+      <div style={{ background: '#F1F4EC', borderRadius: 12, padding: 0, width: uploading ? 520 : 460, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', overflow: 'hidden', transition: 'width 0.4s ease' }}>
+        {/* Header */}
+        <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #C8D8C8' }}>
+          <h3 style={{ margin: 0, fontSize: 15, color: '#344838', fontWeight: 700 }}>
+            {uploading ? '🤖 AI Agents Working…' : '📤 Upload Invoice for AI Audit'}
+          </h3>
           {!uploading && <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, color: '#9BA69C', cursor: 'pointer' }}>✕</button>}
         </div>
 
-        <label style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          padding: '30px 20px', border: '2px dashed #B7C9B7', borderRadius: 8, background: '#E3EDE1',
-          cursor: uploading ? 'default' : 'pointer', textAlign: 'center', transition: 'all 0.2s ease',
-        }}>
-          <span style={{ fontSize: 36, marginBottom: 8 }}>📄</span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#344838' }}>
-            {file ? file.name : 'Click to select or drag invoice image/PDF'}
-          </span>
-          <span style={{ fontSize: 11, color: '#9BA69C', marginTop: 4 }}>
-            {file ? `${(file.size / 1024).toFixed(1)} KB` : 'Supports JPEG, PNG, PDF (Up to 10MB)'}
-          </span>
-          {!uploading && <input type="file" accept="image/*,application/pdf" onChange={handleFileChange} style={{ display: 'none' }} />}
-        </label>
-
-        {uploading && (
-          <div style={{ marginTop: 16, padding: '12px 14px', background: '#E3EDE1', borderRadius: 6, border: '1px solid #B7C9B7' }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#366B4E', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span className="animate-spin" style={{ display: 'inline-block' }}>⚙️</span> {stepMessage}
-            </div>
-            <div style={{ height: 4, background: '#B7C9B7', borderRadius: 2, overflow: 'hidden', marginTop: 8 }}>
-              <div style={{ height: '100%', background: '#366B4E', width: '80%', transition: 'width 2s ease' }} />
-            </div>
-          </div>
-        )}
-
-        <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-          <button
-            onClick={handleUpload}
-            disabled={uploading || !file}
-            style={{
-              flex: 1, padding: '10px', borderRadius: 6, border: 'none',
-              background: file && !uploading ? '#366B4E' : '#9BA69C', color: '#fff',
-              fontWeight: 600, cursor: file && !uploading ? 'pointer' : 'not-allowed', fontSize: 13,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            }}
-          >
-            {uploading ? 'Analyzing with AI Agents…' : 'Start AI Audit'}
-          </button>
+        <div style={{ padding: '16px 20px 20px' }}>
+          {/* File selector (hide when uploading) */}
           {!uploading && (
-            <button onClick={onClose} style={{ padding: '10px 16px', borderRadius: 6, border: '1px solid #B7C9B7', background: 'transparent', color: '#344838', cursor: 'pointer', fontSize: 13 }}>
-              Cancel
-            </button>
+            <label style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              padding: '28px 20px', border: '2px dashed #B7C9B7', borderRadius: 8, background: '#E3EDE1',
+              cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s ease',
+            }}>
+              <span style={{ fontSize: 36, marginBottom: 8 }}>📄</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#344838' }}>
+                {file ? file.name : 'Click to select invoice image/PDF'}
+              </span>
+              <span style={{ fontSize: 11, color: '#9BA69C', marginTop: 4 }}>
+                {file ? `${(file.size / 1024).toFixed(1)} KB` : 'Supports JPEG, PNG, PDF (Up to 10MB)'}
+              </span>
+              <input type="file" accept="image/*,application/pdf" onChange={handleFileChange} style={{ display: 'none' }} />
+            </label>
           )}
+
+          {/* ─── Animated Office Scene (show when uploading) ─── */}
+          {uploading && (
+            <AgentOfficeScene stage={agentStage} fileName={file?.name} />
+          )}
+
+          {/* Buttons */}
+          <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+            <button
+              onClick={handleUpload}
+              disabled={uploading || !file}
+              style={{
+                flex: 1, padding: '10px', borderRadius: 6, border: 'none',
+                background: file && !uploading ? '#366B4E' : '#9BA69C', color: '#fff',
+                fontWeight: 600, cursor: file && !uploading ? 'pointer' : 'not-allowed', fontSize: 13,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {uploading ? '⏳ Agents Analyzing…' : '🚀 Start AI Audit'}
+            </button>
+            {!uploading && (
+              <button onClick={onClose} style={{ padding: '10px 16px', borderRadius: 6, border: '1px solid #B7C9B7', background: 'transparent', color: '#344838', cursor: 'pointer', fontSize: 13 }}>
+                Cancel
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

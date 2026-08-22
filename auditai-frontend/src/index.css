@@ -126,3 +126,68 @@ input, textarea, select {
   }
 }
 
+/* ─── Agent Office Scene Animations ─── */
+
+/* Typing arms animation */
+@keyframes typeLeft {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+@keyframes typeRight {
+  0%, 100% { transform: rotate(5deg); }
+  50% { transform: rotate(-5deg); }
+}
+.typing-arms {
+  animation: typeLeft 0.3s ease-in-out infinite;
+}
+.typing-arms-r {
+  animation: typeRight 0.3s ease-in-out infinite;
+}
+
+/* Screen cursor blink */
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.screen-text {
+  animation: cursorBlink 0.8s step-end infinite;
+  font-size: 6px;
+}
+
+/* Speech bubble pop-in */
+.speech-visible {
+  animation: speechPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.speech-hidden {
+  opacity: 0;
+  transform: translateX(-50%) scale(0.8);
+}
+@keyframes speechPop {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.6) translateY(8px); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
+}
+
+/* Completion badge pulse */
+@keyframes completionPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 20px rgba(54,107,78,0.5); }
+  50% { transform: scale(1.05); box-shadow: 0 4px 30px rgba(54,107,78,0.7); }
+}
+.completion-badge {
+  animation: completionPulse 1.5s ease-in-out infinite;
+}
+
+/* Active agent glow */
+@keyframes agentGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(54,107,78,0.4); }
+  50% { box-shadow: 0 0 16px rgba(54,107,78,0.8); }
+}
+
+/* Office scene entrance */
+@keyframes officeSlideIn {
+  0% { opacity: 0; transform: scale(0.9) translateY(16px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.office-scene {
+  animation: officeSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
