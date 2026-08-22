@@ -1,0 +1,10 @@
+{
+  "description": "Streamline invoice auditing and GST compliance with an AI-powered dashboard that offers real-time insights, vendor management, and detailed audit trails.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+:root {
+  --c-bg: #E3EDE1;
+  --c-primary: #366B4E;
+  --c-primary-hover: #2a5440;
+  --c-sage: #B7C9B7;
+  --c-gray-green: #9BA69C;
+  --c-deep: #344838;
+  --c-cream: #F1F4EC;
+  --c-teal: #71A09A;
+  --c-med: #53778F;
+  --c-high: #D5A15F;
+  --c-crit: #A86A67;
+  --c-low: #71A09A;
+  --c-border: #C8D8C8;
+}
+
+* {
+  font-family: 'DM Sans', sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--c-bg);
+  color: var(--c-deep);
+  margin: 0;
+  padding: 0;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--c-sage); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--c-gray-green); }
+
+/* Smooth scrolling */
+html { scroll-behavior: smooth; }
+
+/* Focus rings */
+*:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 2px;
+}
+
+/* Input base styles */
+input, textarea, select {
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Transitions */
+.transition-default {
+  transition: all 0.15s ease;
+}
+
+/* Severity badge base */
+.badge-low { background: rgba(113,160,154,0.15); color: #71A09A; }
+.badge-med { background: rgba(83,119,143,0.15); color: #53778F; }
+.badge-high { background: rgba(213,161,95,0.15); color: #D5A15F; }
+.badge-crit { background: rgba(168,106,103,0.15); color: #A86A67; }
+
+/* Sidebar link active */
+.nav-active {
+  background: var(--c-primary);
+  color: #fff;
+}
+
+/* Agent workflow connector */
+.agent-line {
+  width: 2px;
+  background: linear-gradient(to bottom, var(--c-teal), var(--c-sage));
+}
+
+/* Card elevation */
+.card {
+  background: var(--c-cream);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+}
+
+/* Loading pulse */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.animate-pulse-slow { animation: pulse 2s ease-in-out infinite; }
+
+/* Status dot blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+.animate-blink { animation: blink 1.5s ease-in-out infinite; }

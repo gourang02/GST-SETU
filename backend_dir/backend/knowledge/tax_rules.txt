@@ -1,0 +1,6 @@
+# =========================================
+# FILE: knowledge/tax_rules.txt
+# =========================================
+HSN 8471: Laptops and computer peripherals attract strictly 18% GST.
+Place of Supply Rule: If the first 2 digits of the Vendor GSTIN and Buyer GSTIN are the SAME, tax is intra-state (CGST + SGST). If DIFFERENT, it is inter-state (IGST). E.g., Buyer is UP (09), Vendor is MH (27) -> IGST applies.
+Section 17(5) Blocked ITC: Input tax credit is strictly blocked for food, beverages, and restaurant bills. Cannot be claimed.

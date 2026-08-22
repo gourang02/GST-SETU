@@ -1,0 +1,12 @@
+# =========================================
+# FILE: requirements.txt
+# =========================================
+
+fastapi
+uvicorn
+python-multipart
+google-generativeai
+pydantic
+psycopg2-binary
+chromadb
+python-dotenv
