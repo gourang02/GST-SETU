@@ -23,11 +23,13 @@ function AppShell() {
   const { user, loading } = useAuth();
   const [page, setPage] = useState<Page>('dashboard');
   const [pageId, setPageId] = useState<string | undefined>(undefined);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { status: wsStatus } = useAuditLogWebSocket();
 
   const navigate = (p: Page, id?: string) => {
     setPage(p);
     setPageId(id);
+    setMobileSidebarOpen(false);
   };
 
   if (loading) {
@@ -68,10 +70,19 @@ function AppShell() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#E3EDE1' }}>
-      <Sidebar current={page} onNavigate={navigate} />
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#E3EDE1', position: 'relative' }}>
+      <Sidebar
+        current={page}
+        onNavigate={navigate}
+        isOpen={mobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
+      />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
-        <Header page={page} wsStatus={wsStatus} />
+        <Header
+          page={page}
+          wsStatus={wsStatus}
+          onToggleMobileSidebar={() => setMobileSidebarOpen(prev => !prev)}
+        />
         <main style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           {renderPage()}
         </main>

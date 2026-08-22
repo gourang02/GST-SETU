@@ -16,12 +16,15 @@ const pageTitles: Record<string, string> = {
   settings: 'AI Configuration',
 };
 
+import { Menu } from 'lucide-react';
+
 interface Props {
   page: Page;
   wsStatus: 'connecting' | 'connected' | 'disconnected' | 'error';
+  onToggleMobileSidebar?: () => void;
 }
 
-export default function Header({ page, wsStatus }: Props) {
+export default function Header({ page, wsStatus, onToggleMobileSidebar }: Props) {
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [loadingHealth, setLoadingHealth] = useState(true);
 
@@ -43,11 +46,25 @@ export default function Header({ page, wsStatus }: Props) {
       background: '#366B4E',
       display: 'flex',
       alignItems: 'center',
-      padding: '0 20px',
-      gap: 16,
+      padding: '0 16px',
+      gap: 12,
       flexShrink: 0,
       borderBottom: '1px solid #2a5440',
     }}>
+      {onToggleMobileSidebar && (
+        <button
+          onClick={onToggleMobileSidebar}
+          style={{
+            background: 'none', border: 'none', color: '#F1F4EC', cursor: 'pointer',
+            padding: '4px 6px', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+          className="mobile-menu-btn"
+          aria-label="Toggle Menu"
+        >
+          <Menu size={20} />
+        </button>
+      )}
+
       <div style={{ flex: 1 }}>
         <h1 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#F1F4EC', letterSpacing: '-0.01em' }}>
           {pageTitles[page] || 'AuditAI'}
