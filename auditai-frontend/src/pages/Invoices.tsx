@@ -239,6 +239,80 @@ function InvoiceDetailPanel({ invoice, onClose, onReAudit, onDelete }: {
   );
 }
 
+function UploadInvoiceModal({ onClose, onUploaded }: { onClose: () => void; onUploaded: () => void }) {
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const { notify } = useNotifications();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!file) { notify('error', 'Please select an invoice file'); return; }
+    setUploading(true);
+    try {
+      await api.uploadInvoice(file);
+      notify('success', `Invoice "${file.name}" uploaded for AI Audit!`);
+      onUploaded();
+      onClose();
+    } catch {
+      notify('error', 'Upload failed. Demo fallback applied.');
+      onUploaded();
+      onClose();
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 600 }}
+      onClick={e => e.target === e.currentTarget && onClose()}>
+      <div style={{ background: '#F1F4EC', borderRadius: 10, padding: 24, width: 440, boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h3 style={{ margin: 0, fontSize: 16, color: '#344838', fontWeight: 700 }}>Upload Invoice for AI Audit</h3>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 18, color: '#9BA69C', cursor: 'pointer' }}>✕</button>
+        </div>
+
+        <label style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          padding: '30px 20px', border: '2px dashed #B7C9B7', borderRadius: 8, background: '#E3EDE1',
+          cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s ease',
+        }}>
+          <span style={{ fontSize: 32, marginBottom: 8 }}>📄</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#344838' }}>
+            {file ? file.name : 'Click to select or drag invoice image/PDF'}
+          </span>
+          <span style={{ fontSize: 11, color: '#9BA69C', marginTop: 4 }}>
+            {file ? `${(file.size / 1024).toFixed(1)} KB` : 'Supports JPEG, PNG, PDF (Up to 10MB)'}
+          </span>
+          <input type="file" accept="image/*,application/pdf" onChange={handleFileChange} style={{ display: 'none' }} />
+        </label>
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+          <button
+            onClick={handleUpload}
+            disabled={uploading || !file}
+            style={{
+              flex: 1, padding: '10px', borderRadius: 6, border: 'none',
+              background: file ? '#366B4E' : '#9BA69C', color: '#fff',
+              fontWeight: 600, cursor: file ? 'pointer' : 'not-allowed', fontSize: 13,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            }}
+          >
+            {uploading ? 'Analyzing with AI…' : 'Start AI Audit'}
+          </button>
+          <button onClick={onClose} style={{ padding: '10px 16px', borderRadius: 6, border: '1px solid #B7C9B7', background: 'transparent', color: '#344838', cursor: 'pointer', fontSize: 13 }}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Invoices({ onNavigate, initialId }: Props) {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -247,6 +321,7 @@ export default function Invoices({ onNavigate, initialId }: Props) {
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedId, setSelectedId] = useState<string | undefined>(initialId);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [showUpload, setShowUpload] = useState(false);
   const { notify } = useNotifications();
 
   const load = useCallback(() => {
@@ -315,6 +390,18 @@ export default function Invoices({ onNavigate, initialId }: Props) {
             <option key={s} value={s}>{s === 'all' ? 'All Statuses' : s.charAt(0).toUpperCase() + s.slice(1)}</option>
           ))}
         </select>
+
+        <button
+          onClick={() => setShowUpload(true)}
+          style={{
+            padding: '7px 14px', borderRadius: 6, border: 'none',
+            background: '#366B4E', color: '#fff', fontSize: 13, fontWeight: 600,
+            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+          }}
+        >
+          <span>📤</span> Upload Invoice
+        </button>
+
         <span style={{ fontSize: 12, color: '#9BA69C', marginLeft: 'auto' }}>
           {filtered.length} invoice{filtered.length !== 1 ? 's' : ''}
         </span>
@@ -386,6 +473,9 @@ export default function Invoices({ onNavigate, initialId }: Props) {
           onDelete={id => setDeleteTarget(id)}
         />
       )}
+
+      {/* Upload Modal */}
+      {showUpload && <UploadInvoiceModal onClose={() => setShowUpload(false)} onUploaded={load} />}
 
       {/* Delete confirm */}
       {deleteTarget && (
