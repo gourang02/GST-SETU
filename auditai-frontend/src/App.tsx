@@ -81,12 +81,58 @@ function AppShell() {
   );
 }
 
+import React, { Component, type ReactNode } from 'react';
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('App ErrorBoundary caught error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#E3EDE1', color: '#344838', fontFamily: 'sans-serif', padding: 20 }}>
+          <h2 style={{ fontSize: 24, marginBottom: 10 }}>Something went wrong</h2>
+          <p style={{ fontSize: 14, color: '#A86A67', marginBottom: 20 }}>{this.state.error?.message || 'An unexpected error occurred.'}</p>
+          <button
+            onClick={() => { this.setState({ hasError: false, error: null }); window.location.reload(); }}
+            style={{ padding: '10px 20px', background: '#366B4E', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600 }}
+          >
+            Reload App
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   return (
-    <NotificationProvider>
-      <AuthProvider>
-        <AppShell />
-      </AuthProvider>
-    </NotificationProvider>
+    <ErrorBoundary>
+      <NotificationProvider>
+        <AuthProvider>
+          <AppShell />
+        </AuthProvider>
+      </NotificationProvider>
+    </ErrorBoundary>
   );
 }
+
