@@ -83,14 +83,15 @@ export default function KnowledgeBase() {
   };
 
   const sevOrder: Record<Severity, number> = { CRIT: 0, HIGH: 1, MED: 2, LOW: 3 };
-  const sorted = [...rules].sort((a, b) => sevOrder[a.severity] - sevOrder[b.severity]);
+  const rulesList = Array.isArray(rules) ? rules : [];
+  const sorted = [...rulesList].sort((a, b) => (sevOrder[a?.severity] ?? 99) - (sevOrder[b?.severity] ?? 99));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
       <div style={{ padding: '14px 20px', borderBottom: '1px solid #C8D8C8', background: '#F1F4EC', display: 'flex', alignItems: 'center', gap: 10 }}>
         <div>
           <div style={{ fontSize: 13, fontWeight: 600, color: '#344838' }}>Audit Rule Library</div>
-          <div style={{ fontSize: 11, color: '#9BA69C' }}>{rules.length} rules · {rules.filter(r => r.active).length} active</div>
+          <div style={{ fontSize: 11, color: '#9BA69C' }}>{rulesList.length} rules · {rulesList.filter(r => r?.active).length} active</div>
         </div>
         <button onClick={() => setShowAdd(true)} style={{ marginLeft: 'auto', padding: '7px 16px', borderRadius: 6, border: 'none', background: '#366B4E', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
           + Add Rule

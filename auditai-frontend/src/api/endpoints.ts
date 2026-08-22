@@ -9,7 +9,11 @@ import * as mock from './mock';
 // Wrap API calls with mock fallback for development
 async function withMock<T>(apiFn: () => Promise<T>, mockData: T): Promise<T> {
   try {
-    return await apiFn();
+    const data = await apiFn();
+    if (Array.isArray(mockData) && !Array.isArray(data)) {
+      return mockData;
+    }
+    return data ?? mockData;
   } catch {
     return mockData;
   }
