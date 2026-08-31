@@ -1,68 +1,111 @@
-#GST SETU
-> A smart digital platform designed to simplify GST-related processes and provide an accessible, user-friendly experience for businesses and taxpayers.
+# 🧾 GST SETU
 
-## 🚀 About The Project
+> An AI-powered GST assistance platform that simplifies GST-related information and queries using Retrieval-Augmented Generation (RAG).
 
-**GST SETU** is a web-based platform focused on making GST-related tasks simpler, faster, and more accessible.
+## 🚀 Overview
 
-The project aims to provide a clean digital interface where users can access GST-related services without dealing with complicated workflows.
+**GST SETU** is an intelligent web-based platform designed to make GST-related information easier to access, understand, and navigate.
 
-It is designed with a focus on:
+The platform combines a user-friendly interface with an **AI-powered Retrieval-Augmented Generation (RAG) pipeline** to provide context-aware responses to GST-related queries.
 
-- 🧾 Simplifying GST-related processes
-- ⚡ Faster and easier access to services
-- 🔐 Secure and structured user workflows
-- 📱 Responsive and user-friendly interface
-- 🤖 Scope for AI-powered assistance and automation
+Instead of depending only on the language model's pre-trained knowledge, the RAG system retrieves relevant information from the available GST knowledge base and uses that context to generate more grounded responses.
 
-## ✨ Key Features
+---
 
-- 📊 **GST Dashboard** – Centralized interface for GST-related activities
-- 🧾 **GST Services** – Structured access to important GST operations
-- 🔍 **Easy Navigation** – Simple and intuitive user experience
-- 📱 **Responsive Design** – Works across desktop and mobile devices
-- 🤖 **AI Integration Ready** – Designed with scope for intelligent GST assistance
-- 🔐 **Secure Architecture** – Structured approach toward user and data security
+## 🎯 Problem Statement
 
-## 🛠️ Tech Stack
+GST rules, regulations, procedures, and compliance-related information can be difficult to understand because of the large amount of technical and frequently referenced information involved.
 
-### Frontend
-- HTML5
-- CSS3
-- JavaScript
-- React.js *(if used)*
+Users often need to search through multiple documents and resources to find relevant information.
 
-### Backend
-- Node.js
-- Express.js
-- REST APIs
+**GST SETU aims to simplify this process by providing an intelligent interface where users can ask GST-related questions and receive relevant, context-aware assistance.**
 
-### Database
-- MongoDB / MySQL *(use whichever your project actually uses)*
+---
 
-### Tools & Platforms
-- Git
-- GitHub
-- VS Code
-- Postman
-- Vercel / Netlify
+## 💡 Solution
 
-## 🏗️ Project Architecture
+GST SETU provides a centralized platform for GST-related assistance with an AI-powered question-answering system.
+
+The application:
+
+- 🔍 Retrieves relevant GST information
+- 🤖 Uses RAG for context-aware AI responses
+- 📚 Grounds responses using retrieved information
+- 💬 Allows users to interact with the AI assistant
+- 🧾 Organizes GST-related information in a simplified manner
+- 📱 Provides a user-friendly and responsive interface
+
+---
+Why RAG?
+
+Traditional LLM-based systems can sometimes generate responses that are not directly grounded in a specific knowledge source.
+
+GST SETU uses RAG to improve this workflow by retrieving relevant GST information before generating the final response.
+
+This allows the AI assistant to:
+
+Retrieve relevant information before answering
+Use external knowledge as context
+Reduce dependency on the model's internal knowledge
+Provide more relevant GST-related responses
+Create a knowledge-grounded question-answering experience
+✨ Key Features
+🤖 AI GST Assistant
+
+Interact with an AI-powered assistant to ask GST-related questions and receive context-aware responses.
+
+🔎 Intelligent Information Retrieval
+
+The RAG pipeline retrieves relevant information from the available GST knowledge base before generating an answer.
+
+📚 Knowledge-Grounded Responses
+
+Responses are generated using retrieved contextual information instead of relying solely on general model knowledge.
+
+🧾 GST Information Assistance
+
+Provides a simplified interface for accessing and understanding GST-related information.
+
+📱 Responsive Interface
+
+Designed to provide a clean and accessible experience across different screen sizes.
+
+⚡ Fast User Interaction
+
+The application focuses on providing a simple workflow from user query to retrieved information and AI response.
+
+# 🤖 AI-Powered RAG System
+
+One of the core components of GST SETU is its **Retrieval-Augmented Generation (RAG)** pipeline.
+
+### 🔄 RAG Workflow
 
 ```text
-GST-SETU
-│
-├── frontend/
-│   ├── components/
-│   ├── pages/
-│   ├── assets/
-│   └── styles/
-│
-├── backend/
-│   ├── controllers/
-│   ├── routes/
-│   ├── models/
-│   └── middleware/
-│
-├── README.md
-└── package.json
+GST Documents / Knowledge Base
+            │
+            ▼
+      Document Processing
+            │
+            ▼
+      Text Chunking
+            │
+            ▼
+       Embeddings
+            │
+            ▼
+     Vector Storage
+            │
+            ▼
+       User Query
+            │
+            ▼
+    Semantic Retrieval
+            │
+            ▼
+ Relevant Context / Documents
+            │
+            ▼
+          LLM
+            │
+            ▼
+   Context-Aware Response
